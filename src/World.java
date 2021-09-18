@@ -1,14 +1,15 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class World {
 
     private Player player;
-    private Seller seller;
+    private Merchant merchant;
     private Scanner scanner;
 
     public World(Player player) {
         this.player = player;
-        this.seller = new Seller();
+        this.merchant = new Merchant(player);
         this.scanner = new Scanner(System.in);
     }
 
@@ -23,8 +24,8 @@ public class World {
         System.out.println("3. На выход");
         int variant = this.scanner.nextInt();
         switch (variant) {
-            case 1: goToSeller(); break;
-            case 2: goToForest(); break;
+            case 1: goToMerchant(); break;
+            case 2: fight(); break;
             case 3: exitGame(); break;
             default:
                 System.out.println("Вы ввели не верную команду.");
@@ -32,7 +33,7 @@ public class World {
         }
     }
 
-    public void goToSeller() {
+    public void goToMerchant() {
         System.out.println("Торговец еще не вышел на работу");
 
         while (true) {
@@ -48,22 +49,6 @@ public class World {
     }
 
     public void goToForest() {
-        // fighting
-        Thread thread = new Thread(() -> {
-            double v = Math.random() * 1;
-            Monster ch = null;
-            if (v == 1) ch = new Monster.Goblin("Goblin", 100, 30, 5);
-            else ch = new Monster.Skelet("Skelet", 100, 50, 3);
-            System.out.println("Монстр " + ch.getName());
-            this.fight(ch);
-        });
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         while (true) {
             System.out.println("Куда вы хотите пойти?");
             System.out.println("1. Вернуться в город");
@@ -74,7 +59,7 @@ public class World {
                     this.showMenu();
                     return;
                 case 2:
-                    this.goToForest();
+                    this.fight();
                     return;
                 default:
                     System.out.println("Вы ввели не верную команду");
@@ -86,18 +71,26 @@ public class World {
         System.out.println("Игра завершена");
     }
 
-    public void fight(Monster monster) {
-        while (player.getHealth() > 0 && monster.getHealth() > 0) {
-            player.attack(monster);
-            if (monster.getHealth() < 1) break;
+    public void fight() {
+        Character monster;
+        if (new Random().nextInt(2) == 1) monster = new Goblin("Goblin", 25, 25, 5, 12, 1, 200, 5);
+        else monster = new Skelet("Skelet", 80, 80, 10, 4, 2, 500, 20);
 
-            monster.attack(player);
+        // fighting
+        Battle battle = new Battle(this.player, monster);
+        try {
+            battle.start();
+            battle.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        if (monster.getHealth() <= 0) {
-            System.out.println(String.format("Игрок %s убил монстра %s", this.player.getName(), monster.getName()));
+
+        if (player.isAlive()) {
+            System.out.printf("Игрок %s убил монстра %s%n", this.player.getName(), monster.getName());
+            this.goToForest();
         }
         else {
-            System.out.println(String.format("Игрок %s был убит", player.getName()));
+            System.out.printf("Игрок %s был убит%n", player.getName());
             this.exitGame();
         }
     }

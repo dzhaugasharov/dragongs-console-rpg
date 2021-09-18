@@ -7,7 +7,7 @@ public class Main {
         System.out.println("Enter your name");
         String name = scanner.nextLine();
 
-        Player player = new Player(name, 100, 1, 1);
+        Player player = new Player(name, 100,100, 10, 10, 1, 0, 10);
         World world = new World(player);
         world.startGame();
     }
