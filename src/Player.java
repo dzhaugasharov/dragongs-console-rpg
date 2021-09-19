@@ -26,4 +26,19 @@ public class Player extends Character {
         this.haveKey = true;
     }
 
+
+
+    public void status() {
+        System.out.print("level:" + this.level);
+        System.out.print(" strength:" + this.power);
+        System.out.print(" agility:" + this.agility);
+        System.out.println(" gold:" + this.gold);
+
+        System.out.println("HP[==" + this.health + "/" + this.maxHealth + "==]");
+        System.out.println("EXP[==" + this.exp + "/1000==]");
+    }
+
+    public boolean isHaveKey() {
+        return haveKey;
+    }
 }
